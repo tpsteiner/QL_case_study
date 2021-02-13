@@ -1,6 +1,5 @@
 library(tidyverse)
 library(skimr)
-library(yardstick)
 
 # Load data into tibble, and separate current model results for performance measurement
 campaign <- read_csv("DSA Data Set.csv")
@@ -35,35 +34,23 @@ results <- thresholds %>%
 
 test_pred <- results$outcome[8][[1]]$outcome
 
+# Create new function to build confusion matrices
+pred_vs_actual <- function(pred, actual, x = "yes", y = "yes") {
+  print(pred)
+  sum(map2_lgl(pred, actual, ~ .x == x & .y == y))
+}
+
+pred_vs_actual(test_pred, campaign$y)
 
 sum(map2_lgl(test_pred, campaign$y, ~ .x == "yes" & .y == "yes"))
 
-x <- results %>% mutate(TP = sum(map2_lgl(outcome[[1]]$outcome, campaign$y, ~ .x == "yes" & .y == "yes")))
+x <- results %>% mutate(TP = map2(outcome[[1]], campaign$y, pred_vs_actual))
 
-# y <- tibble(outcome = x[8, 2]$outcome[[1]])
-# y %>% group_by(outcome) %>% count()
 
-x %>% mutate(sensitivty = )
-sum(x$outcome[[99]] == campaign$y)
-map(ModelPrediction, numeric_to_binary)
 
-campaign_accuracy <- function(x, y) {
-  map(if_else(y > x, "No", "Yes"))
-}
 
-numeric_to_binary(probabilities[1,], ModelPrediction)
 
-add_prediction <- function(data, p) {
-  
-}
 
-prediction_results <- tibble()
-  
-  #tibble(ModelPrediction = campaign$ModelPrediction, probabilities)
-prediction_results2 <- prediction_results %>% mutate( = rep("Yes", nrow(campaign)))
-#as.character(probabilities[1])
-
-plot(campaign$ModelPrediction, as.factor(campaign$y))
 
 skim(campaign)
 
